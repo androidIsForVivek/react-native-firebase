@@ -19,7 +19,10 @@
 #import <Firebase/Firebase.h>
 #import <RNFBApp/RNFBSharedUtils.h>
 #import <React/RCTBridgeModule.h>
+#import <RNFBFirestoreQuery.h>
+#import <RNFBFirestoreCommon.h>
+#import <RNFBFirestoreSerialize.h>
 
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
+@interface RNFBFirestoreTransactionModule : NSObject <RCTBridgeModule>
 
 @end

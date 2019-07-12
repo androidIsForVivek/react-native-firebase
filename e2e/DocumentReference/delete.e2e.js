@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2016-present Invertase Limited & Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,20 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <Firebase/Firebase.h>
-#import <RNFBApp/RNFBSharedUtils.h>
-#import <React/RCTBridgeModule.h>
+const { wipe } = require('../helpers');
 
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
+describe('firestore.doc().delete()', () => {
+  before(() => wipe());
 
-@end
+  it('deletes a document', async () => {
+    const ref = firebase.firestore().doc('v6/deleteme');
+    await ref.set({ foo: 'bar' });
+    const snapshot1 = await ref.get();
+    snapshot1.id.should.equal('deleteme');
+    snapshot1.exists.should.equal(true);
+    await ref.delete();
+    const snapshot2 = await ref.get();
+    snapshot2.id.should.equal('deleteme');
+    snapshot2.exists.should.equal(false);
+  });
+});

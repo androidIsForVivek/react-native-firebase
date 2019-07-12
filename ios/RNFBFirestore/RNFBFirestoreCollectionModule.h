@@ -19,7 +19,12 @@
 #import <Firebase/Firebase.h>
 #import <RNFBApp/RNFBSharedUtils.h>
 #import <React/RCTBridgeModule.h>
+#import <RNFBFirestoreQuery.h>
+#import <RNFBFirestoreCommon.h>
+#import <RNFBFirestoreSerialize.h>
 
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
+static NSString *const KEY_INCLUDE_METADATA_CHANGES = @"includeMetadataChanges";
+
+@interface RNFBFirestoreCollectionModule : NSObject <RCTBridgeModule>
 
 @end

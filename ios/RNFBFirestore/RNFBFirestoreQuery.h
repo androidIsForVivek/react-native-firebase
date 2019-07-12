@@ -1,3 +1,4 @@
+//
 /**
  * Copyright (c) 2016-present Invertase Limited & Contributors
  *
@@ -15,11 +16,20 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <Firebase/Firebase.h>
-#import <RNFBApp/RNFBSharedUtils.h>
 #import <React/RCTBridgeModule.h>
+#import <Firebase/Firebase.h>
+#import <RNFBFirestoreSerialize.h>
 
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
+@interface RNFBFirestoreQuery : NSObject
+
+@property FIRFirestore *firestore;
+@property NSArray *filters;
+@property NSArray *orders;
+@property NSDictionary *options;
+@property FIRQuery *query;
+
+- (FIRQuery *)instance;
+
+- (id)initWithModifiers:(FIRFirestore *)firestore query:(FIRQuery *)query filters:(NSArray *)filters orders:(NSArray *)orders options:(NSDictionary *)options;
 
 @end

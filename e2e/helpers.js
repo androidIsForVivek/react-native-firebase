@@ -1,4 +1,6 @@
-/**
+/* eslint-disable no-console */
+
+/*
  * Copyright (c) 2016-present Invertase Limited & Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +17,8 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <Firebase/Firebase.h>
-#import <RNFBApp/RNFBSharedUtils.h>
-#import <React/RCTBridgeModule.h>
-
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
-
-@end
+exports.wipe = async function wipe(collection = 'v6', debug = false) {
+  if (debug) console.time('wipe');
+  await TestAdminApi.firestore().clearCollection(collection);
+  if (debug) console.timeEnd('wipe');
+};

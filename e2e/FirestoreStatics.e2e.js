@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2016-present Invertase Limited & Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,21 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <Firebase/Firebase.h>
-#import <RNFBApp/RNFBSharedUtils.h>
-#import <React/RCTBridgeModule.h>
+describe('firestore.X', () => {
+  describe('setLogLevel', () => {
+    it('throws if invalid level', () => {
+      try {
+        firebase.firestore.setLogLevel('verbose');
+        return Promise.reject(new Error('Did not throw an Error.'));
+      } catch (error) {
+        error.message.should.containEql(`'logLevel' expected one of 'debug', 'error' or 'silent'`);
+        return Promise.resolve();
+      }
+    });
 
-@interface RNFBFirestoreModule : NSObject <RCTBridgeModule>
-
-@end
+    it('enabled and disables logging', () => {
+      firebase.firestore.setLogLevel('silent');
+      firebase.firestore.setLogLevel('debug');
+    });
+  });
+});
