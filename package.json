@@ -77,8 +77,7 @@
   },
   "workspaces": {
     "packages": [
-      "packages/app",
-      "packages/firestore",
+      "packages/*",
       "tests"
     ],
     "nohoist": [
