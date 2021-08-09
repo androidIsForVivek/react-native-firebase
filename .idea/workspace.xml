@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0fa7b0e2-0626-45e9-b145-90873ed2973f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1wMs2rMkPTPbYwlZ4aTL7JFy9bE" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0fa7b0e2-0626-45e9-b145-90873ed2973f" name="Default Changelist" comment="" />
+      <created>1628279587461</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1628279587461</updated>
+      <workItem from="1628279589766" duration="1234000" />
+      <workItem from="1628282930221" duration="1824000" />
+      <workItem from="1628285299769" duration="6403000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/../APP-android/Mobile-mmt-react-native/node_modules/apollo-server-env/src/index.d.ts" />
+        <option value="$PROJECT_DIR$/../APP-android/Mobile-mmt-react-native/node_modules/apollo-datasource/node_modules/apollo-server-env/src/index.d.ts" />
+        <option value="$PROJECT_DIR$/../APP-android/Mobile-mmt-react-native/node_modules/react-native-svg/src/index.d.ts" />
+        <option value="$PROJECT_DIR$/../APP-android/Mobile-mmt-react-native/node_modules/react-native-redash/src/index.d.ts" />
+        <option value="$PROJECT_DIR$/../APP-android/Mobile-mmt-react-native/node_modules/apollo-env/src/fetch/index.d.ts" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="-1728" y="123" key="DiffContextDialog" timestamp="1628495843950">
+      <screen x="-1920" y="63" width="1920" height="1080" />
+    </state>
+    <state x="-1728" y="123" key="DiffContextDialog/0.0.1920.1200/-1920.63.1920.1080@-1920.63.1920.1080" timestamp="1628495843950" />
+    <state x="-1360" y="354" key="Vcs.Push.Dialog.v2" timestamp="1628495854246">
+      <screen x="-1920" y="63" width="1920" height="1080" />
+    </state>
+    <state x="-1360" y="354" key="Vcs.Push.Dialog.v2/0.0.1920.1200/-1920.63.1920.1080@-1920.63.1920.1080" timestamp="1628495854246" />
+  </component>
+</project>
