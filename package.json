@@ -6,7 +6,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "build:clean": "rimraf android/build && rimraf ios/build",
+    "build:clean": "rimraf android/build && rimraf ios/build"
   },
   "repository": {
     "type": "git",
