@@ -437,7 +437,7 @@ firestore().doc('users/ABC').update({
 Cloud Firestore also allows for storing arrays. To help manage the values with an array (adding or removing) the API
 exposes an `arrayUnion` and `arrayRemove` methods on the [`FieldValue`](/reference/firestore/fieldvalue) class.
 
-To add a new value to an array (if it does not exist):
+To add a new value to an array (if value does not exist, will not add duplicate values):
 
 ```js
 firestore()
@@ -447,7 +447,7 @@ firestore()
   });
 ```
 
-To remove a value from the array (if it exists):
+To remove a value from the array (if the value exists):
 
 ```js
 firestore()
@@ -592,3 +592,27 @@ async function bootstrap() {
   });
 }
 ```
+
+## Data bundles
+
+Cloud Firestore data bundles are static data files built by you from Cloud Firestore document and query snapshots,
+and published by you on a CDN, hosting service or other solution. Once a bundle is loaded, a client app can query documents
+from the local cache or the backend.
+
+To load and query data bundles, use the `loadBundle` and `namedQuery` methods:
+
+```js
+import firestore from '@react-native-firebase/firestore';
+
+// load the bundle contents
+const response = await fetch('https://api.example.com/bundles/latest-stories');
+const bundle = await response.text();
+await firestore().loadBundle(bundle);
+
+// query the results from the cache
+// note: omitting "source: cache" will query the Firestore backend
+const query = firestore().namedQuery('latest-stories-query');
+const snapshot = await query.get({ source: 'cache' });
+```
+
+You can build data bundles with the Admin SDK. For more information about building and serving data bundles, see Firebase Firestore main documentation on [Data bundles](https://firebase.google.com/docs/firestore/bundles) as well as their "[Bundle Solutions](https://firebase.google.com/docs/firestore/solutions/serve-bundles)" page

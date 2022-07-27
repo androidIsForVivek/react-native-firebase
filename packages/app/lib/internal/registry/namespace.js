@@ -20,7 +20,14 @@ import FirebaseApp from '../../FirebaseApp';
 import SDK_VERSION from '../../version';
 import { DEFAULT_APP_NAME, KNOWN_NAMESPACES } from '../constants';
 import FirebaseModule from '../FirebaseModule';
-import { getApp, getApps, initializeApp, setOnAppCreate, setOnAppDestroy } from './app';
+import {
+  getApp,
+  getApps,
+  initializeApp,
+  setLogLevel,
+  setOnAppCreate,
+  setOnAppDestroy,
+} from './app';
 
 // firebase.X
 let FIREBASE_ROOT = null;
@@ -187,11 +194,16 @@ function firebaseRootModuleProxy(firebaseNamespace, moduleNamespace) {
     return getOrCreateModuleForRoot(moduleNamespace);
   }
 
+  moduleWithDashes = moduleNamespace
+    .split(/(?=[A-Z])/)
+    .join('-')
+    .toLowerCase();
+
   throw new Error(
     [
       `You attempted to use 'firebase.${moduleNamespace}' but this module could not be found.`,
       '',
-      `Ensure you have installed and imported the '@react-native-firebase/${moduleNamespace}' package.`,
+      `Ensure you have installed and imported the '@react-native-firebase/${moduleWithDashes}' package.`,
     ].join('\r\n'),
   );
 }
@@ -208,11 +220,16 @@ export function firebaseAppModuleProxy(app, moduleNamespace) {
     return getOrCreateModuleForApp(app, moduleNamespace);
   }
 
+  moduleWithDashes = moduleNamespace
+    .split(/(?=[A-Z])/)
+    .join('-')
+    .toLowerCase();
+
   throw new Error(
     [
       `You attempted to use "firebase.app('${app.name}').${moduleNamespace}" but this module could not be found.`,
       '',
-      `Ensure you have installed and imported the '@react-native-firebase/${moduleNamespace}' package.`,
+      `Ensure you have installed and imported the '@react-native-firebase/${moduleWithDashes}' package.`,
     ].join('\r\n'),
   );
 }
@@ -231,6 +248,7 @@ export function createFirebaseRoot() {
       return getApps();
     },
     SDK_VERSION,
+    setLogLevel,
   };
 
   for (let i = 0; i < KNOWN_NAMESPACES.length; i++) {

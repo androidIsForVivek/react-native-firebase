@@ -143,6 +143,25 @@ export namespace FirebaseMessagingTypes {
     threadId?: string;
   }
 
+  /**
+   * Options for `getToken()`, `deleteToken()`
+   */
+  export interface TokenOptions {
+    /**
+     * The app name of the FirebaseApp instance.
+     *
+     * @platform android Android
+     */
+    appName?: string;
+
+    /**
+     * The senderID for a particular Firebase project.
+     *
+     * @platform ios iOS
+     */
+    senderId?: string;
+  }
+
   export interface Notification {
     /**
      * The notification title.
@@ -435,6 +454,15 @@ export namespace FirebaseMessagingTypes {
      * Defaults to true.
      */
     sound?: boolean;
+
+    /**
+     * Request permission to display a button for in-app notification settings.
+     *
+     * Default to false
+     *
+     * @platform ios iOS >= 12
+     */
+    providesAppNotificationSettings?: boolean;
   }
 
   /**
@@ -559,8 +587,18 @@ export namespace FirebaseMessagingTypes {
     getInitialNotification(): Promise<RemoteMessage | null>;
 
     /**
-     * Returns an FCM token for this device. Optionally you can specify a custom authorized entity
-     * or scope to tailor tokens to your own use-case.
+     * When the app is opened from iOS notifications settings from a quit state,
+     * this method will return `true` or `false` if the app was opened via another method.
+     *
+     * See `setOpenSettingsForNotificationsHandler` to subscribe to when the notificiation is opened when the app
+     * is in background state.
+     *
+     * @ios iOS >= 12
+     */
+    getDidOpenSettingsForNotification(): Promise<boolean>;
+
+    /**
+     * Returns an FCM token for this device. Optionally you can specify a custom options to your own use-case.
      *
      * It is recommended you call this method on app start and update your backend with the new token.
      *
@@ -582,8 +620,10 @@ export namespace FirebaseMessagingTypes {
      *     fcmTokens: firebase.firestore.FieldValues.arrayUnion(fcmToken),
      *   });
      * ```
+     *
+     * @param options Options to override senderId (iOS) and projectId (Android).
      */
-    getToken(): Promise<string>;
+    getToken(options?: TokenOptions): Promise<string>;
 
     /**
      * Returns wether the root view is headless or not
@@ -603,8 +643,10 @@ export namespace FirebaseMessagingTypes {
      * ```js
      * await firebase.messaging().deleteToken();
      * ```
+     *
+     * @param options Options to override senderId (iOS) and projectId (Android).
      */
-    deleteToken(): Promise<void>;
+    deleteToken(options?: TokenOptions): Promise<void>;
 
     /**
      * When any FCM payload is received, the listener callback is called with a `RemoteMessage`.
@@ -685,18 +727,18 @@ export namespace FirebaseMessagingTypes {
      * be received or sent.
      *
      * On iOS < 12, a modal will be shown to the user requesting messaging permissions for the app.
-     * Once handled, the promise will resolve with `true` if permission was granted.
+     * Once handled, the promise will resolve with `AuthorizationStatus.AUTHORIZED` if permission was granted.
      *
      * On iOS >= 12, the app will be granted [Provisional Authorization](http://iosbrain.com/blog/2018/07/05/new-in-ios-12-implementing-provisional-authorization-for-quiet-notifications-in-swift/),
-     * and will resolve `true`. The user will be able to receive FCM payloads and Notifications immediately;
+     * and will resolve `AuthorizationStatus.AUTHORIZED`. The user will be able to receive FCM payloads and Notifications immediately;
      * but notifications will be displayed silently. The user, through Notification Center, then has the option of upgrading your apps notifications to no longer be silent.
      *
-     * > You can safely call this method on Android without platform checks. It's a no-op on Android and will promise resolve `true`.
+     * > You can safely call this method on Android without platform checks. It's a no-op on Android and will promise resolve `AuthorizationStatus.AUTHORIZED`.
      *
      * #### Example
      *
      * ```js
-     * const permissionGranted = await firebase.messaging().requestPermission();
+     * const authorizationStatus = await firebase.messaging().requestPermission();
      * ```
      *
      * @ios
@@ -885,6 +927,17 @@ export namespace FirebaseMessagingTypes {
      *
      */
     setBackgroundMessageHandler(handler: (message: RemoteMessage) => Promise<any>): void;
+
+    /**
+     * Set a handler function which is called when the `${App Name} notifications settings`
+     * link in iOS settings is clicked.
+     *
+     * This method must be called **outside** of your application lifecycle, e.g. alongside your
+     * `AppRegistry.registerComponent()` method call at the the entry point of your application code.
+     *
+     * @ios iOS >= 12
+     */
+    setOpenSettingsForNotificationsHandler(handler: (message: RemoteMessage) => any): void;
 
     /**
      * Send a new `RemoteMessage` to the FCM server.

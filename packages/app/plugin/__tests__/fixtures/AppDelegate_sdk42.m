@@ -1,3 +1,6 @@
+// This AppDelegate prebuild template is used in Expo SDK 42 and older
+// It expects the old react-native-unimodules architecture (UM* prefix)
+
 #import "AppDelegate.h"
 
 #import <React/RCTBridge.h>

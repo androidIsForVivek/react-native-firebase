@@ -23,6 +23,7 @@ import {
   isIOS,
   isObject,
   isString,
+  isUndefined,
 } from '@react-native-firebase/app/lib/common';
 import {
   createModuleNamespace,
@@ -41,6 +42,7 @@ const statics = {
     PROVISIONAL: 2,
   },
   NotificationAndroidPriority: {
+    PRIORITY_MIN: -2,
     PRIORITY_LOW: -1,
     PRIORITY_DEFAULT: 0,
     PRIORITY_HIGH: 1,
@@ -58,6 +60,7 @@ const namespace = 'messaging';
 const nativeModuleName = 'RNFBMessagingModule';
 
 let backgroundMessageHandler;
+let openSettingsForNotificationHandler;
 
 class FirebaseMessagingModule extends FirebaseModule {
   constructor(...args) {
@@ -92,6 +95,19 @@ class FirebaseMessagingModule extends FirebaseModule {
 
         return backgroundMessageHandler(remoteMessage);
       });
+
+      this.emitter.addListener('messaging_settings_for_notification_opened', remoteMessage => {
+        if (!openSettingsForNotificationHandler) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            'No handler for notification settings link has been set. Set a handler via the "setOpenSettingsForNotificationsHandler" method',
+          );
+
+          return Promise.resolve();
+        }
+
+        return openSettingsForNotificationHandler(remoteMessage);
+      });
     }
   }
 
@@ -122,19 +138,51 @@ class FirebaseMessagingModule extends FirebaseModule {
   }
 
   getInitialNotification() {
-    return this.native.getInitialNotification();
+    return this.native.getInitialNotification().then(value => {
+      if (value) {
+        return value;
+      }
+      return null;
+    });
+  }
+
+  getDidOpenSettingsForNotification() {
+    if (!isIOS) return Promise.resolve(false);
+    return this.native.getDidOpenSettingsForNotification().then(value => value);
   }
 
   getIsHeadless() {
     return this.native.getIsHeadless();
   }
 
-  getToken() {
-    return this.native.getToken();
+  getToken({ appName, senderId } = {}) {
+    if (!isUndefined(appName) && !isString(appName)) {
+      throw new Error("firebase.messaging().getToken(*) 'projectId' expected a string.");
+    }
+
+    if (!isUndefined(senderId) && !isString(senderId)) {
+      throw new Error("firebase.messaging().getToken(*) 'senderId' expected a string.");
+    }
+
+    return this.native.getToken(
+      appName || this.app.name,
+      senderId || this.app.options.messagingSenderId,
+    );
   }
 
-  deleteToken() {
-    return this.native.deleteToken();
+  deleteToken({ appName, senderId } = {}) {
+    if (!isUndefined(appName) && !isString(appName)) {
+      throw new Error("firebase.messaging().deleteToken(*) 'projectId' expected a string.");
+    }
+
+    if (!isUndefined(senderId) && !isString(senderId)) {
+      throw new Error("firebase.messaging().deleteToken(*) 'senderId' expected a string.");
+    }
+
+    return this.native.deleteToken(
+      appName || this.app.name,
+      senderId || this.app.options.messagingSenderId,
+    );
   }
 
   onMessage(listener) {
@@ -185,6 +233,7 @@ class FirebaseMessagingModule extends FirebaseModule {
       provisional: false,
       sound: true,
       criticalAlert: false,
+      providesAppNotificationSettings: false,
     };
 
     if (!permissions) {
@@ -306,6 +355,20 @@ class FirebaseMessagingModule extends FirebaseModule {
     }
   }
 
+  setOpenSettingsForNotificationsHandler(handler) {
+    if (!isIOS) {
+      return;
+    }
+
+    if (!isFunction(handler)) {
+      throw new Error(
+        "firebase.messaging().setOpenSettingsForNotificationsHandler(*) 'handler' expected a function.",
+      );
+    }
+
+    openSettingsForNotificationHandler = handler;
+  }
+
   sendMessage(remoteMessage) {
     if (isIOS) {
       throw new Error(`firebase.messaging().sendMessage() is only supported on Android devices.`);
@@ -384,7 +447,9 @@ export default createModuleNamespace({
     'messaging_message_received',
     'messaging_message_send_error',
     'messaging_notification_opened',
-    ...(isIOS ? ['messaging_message_received_background'] : []),
+    ...(isIOS
+      ? ['messaging_message_received_background', 'messaging_settings_for_notification_opened']
+      : []),
   ],
   hasMultiAppSupport: false,
   hasCustomUrlOrRegionSupport: false,

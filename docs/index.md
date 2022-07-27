@@ -11,7 +11,7 @@ React Native Firebase is the officially recommended collection of packages that 
 Before getting started, the documentation assumes you are able to create a project with React Native and that you have an active Firebase project.
 If you do not meet these prerequisites, follow the links below:
 
-- [Getting started with React Native](https://facebook.github.io/react-native/docs/getting-started.html)
+- [React Native - Setting up the development environment](https://reactnative.dev/docs/environment-setup)
 - [Create a new Firebase project](https://console.firebase.google.com/)
 
 ## Installation
@@ -45,8 +45,9 @@ local projects package name which can be found inside of the `manifest` tag with
 file within your project.
 
 > The debug signing certificate is optional to use Firebase with your app, but is required for Dynamic Links, Invites and Phone Authentication.
-> To generate a certificate run `cd android && ./gradlew signingReport` and copy the SHA1 from the `debug` key. This generates two variant keys.
-> You can copy the 'SHA1' that belongs to the `debugAndroidTest` variant key option.
+> To generate a certificate run `cd android && ./gradlew signingReport`. This generates two variant keys.
+> You have to copy both 'SHA1' and 'SHA-256' keys that belong to the 'debugAndroidTest' variant key option.
+> Then, you can add those keys to the 'SHA certificate fingerprints' on your app in Firebase console.
 
 Download the `google-services.json` file and place it inside of your project at the following location: `/android/app/google-services.json`.
 
@@ -61,7 +62,7 @@ First, add the `google-services` plugin as a dependency inside of your `/android
 buildscript {
   dependencies {
     // ... other dependencies
-    classpath 'com.google.gms:google-services:4.3.8'
+    classpath 'com.google.gms:google-services:4.3.13'
     // Add me --- /\
   }
 }
@@ -76,7 +77,7 @@ apply plugin: 'com.google.gms.google-services' // <- Add this line
 
 ### 3. iOS Setup
 
-To allow the iOS app to securely connect to your Firebase project, a configuration file must be downloaded and added to your project.
+To allow the iOS app to securely connect to your Firebase project, a configuration file must be downloaded and added to your project, and you must enable frameworks in CocoaPods
 
 #### Generating iOS credentials
 
@@ -112,13 +113,31 @@ Within your existing `didFinishLaunchingWithOptions` method, add the following t
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Add me --- \/
-  if ([FIRApp defaultApp] == nil) {
-    [FIRApp configure];
-  }
+  [FIRApp configure];
   // Add me --- /\
   // ...
 }
 ```
+
+#### Altering CocoaPods to use frameworks
+
+Beginning with firebase-ios-sdk v9+ (react-native-firebase v15+) you must tell CocoaPods to use frameworks.
+
+Open the file `./ios/Podfile` and add this line inside your targets:
+
+```
+use_frameworks!
+```
+
+To use Static Frameworks on iOS, you also need to manually enable this for the project with the following global to the top of your `/ios/Podfile` file:
+
+```ruby
+$RNFirebaseAsStaticFramework = true
+```
+
+Expo users may use [expo-build-properties](https://docs.expo.dev/versions/v45.0.0/sdk/build-properties/#pluginconfigtypeios) to turn on `use_frameworks`. We are unsure how Expo users add variables to a Podfile and may need a community contribution to the config-plugin here to do so, PRs welcome!
+
+> Note `use_frameworks` [is _not_ compatible with Flipper, Hermes, React Native New Architecture or react-native 0.69.0](https://github.com/reactwg/react-native-releases/discussions/21#discussioncomment-2924919). There is already [a patch-package patch available for 0.69.0](https://github.com/mikehardy/rnfbdemo/blob/main/patches/react-native%2B0.69.0.patch) that makes it work with and without Hermes and it will be released with 0.69.1. Community support to help fix `use_frameworks` support for Hermes and New Architecture is welcome!
 
 ### 4. Autolinking & rebuilding
 
@@ -184,16 +203,15 @@ project.ext {
     versions: [
       // Overriding Build/Android SDK Versions
       android : [
-        minSdk    : 16,
-        targetSdk : 30,
-        compileSdk: 30,
-        buildTools: "30.0.2"
+        minSdk    : 19,
+        targetSdk : 31,
+        compileSdk: 31,
       ],
 
       // Overriding Library SDK Versions
       firebase: [
         // Override Firebase SDK Version
-        bom           : "28.0.1"
+        bom           : "30.3.0"
       ],
     ],
   ])
@@ -208,7 +226,7 @@ Open your projects `/ios/Podfile` and add any of the globals shown below to the 
 
 ```ruby
 # Override Firebase SDK Version
-$FirebaseSDKVersion = '8.0.0'
+$FirebaseSDKVersion = '9.3.0'
 ```
 
 Once changed, reinstall your projects pods via pod install and rebuild your project with `npx react-native run-ios`.
@@ -246,15 +264,6 @@ To increase throughput, you can tune the thread pool executor via `firebase.json
 | `android_task_executor_maximum_pool_size`  | Maximum pool size of ThreadPoolExecutor. Defaults to `1`. Larger values typically improve performance when executing large numbers of asynchronous tasks, e.g. Firestore queries. Setting this value to `0` completely disables the pooled executor and all tasks execute in serial per module. |
 | `android_task_executor_keep_alive_seconds` | Keep-alive time of ThreadPoolExecutor, in seconds. Defaults to `3`. Excess threads in the pool executor will be terminated if they have been idle for more than the keep-alive time. This value doesn't have any effect when the maximum pool size is lower than `2`.                           |
 
-### Allow iOS Static Frameworks
-
-If you are using Static Frameworks on iOS, you need to manually enable this for the project. To enable Static Framework
-support, add the following global to the top of your `/ios/Podfile` file:
-
-```ruby
-$RNFirebaseAsStaticFramework = true
-```
-
 ### Expo
 
 Integration with Expo is possible in both bare workflow and [custom managed workflow](https://docs.expo.io/workflow/customizing/) via [config plugins](https://docs.expo.io/guides/config-plugins/).
@@ -264,6 +273,8 @@ React Native Firebase cannot be used in the "Expo Go" app, because [it requires 
 #### Installation
 
 _If you're using [Bare Workflow](https://docs.expo.io/introduction/managed-vs-bare/#bare-workflow), please follow the above installation steps instead._
+
+The recommendation is to use a [custom development client](https://docs.expo.dev/clients/getting-started/). If starting a new app, you can run `npx create-react-native-app -t with-dev-client` to have this set up automatically. It will also allow you to use the Expo Application Service to test the android and iOS builds.
 
 After installing the `@react-native-firebase/app` NPM package, add the [config plugin](https://docs.expo.io/guides/config-plugins/) to the [`plugins`](https://docs.expo.io/versions/latest/config/app/#plugins) array of your `app.json` or `app.config.js`.
 
@@ -281,15 +292,15 @@ The `app.json` for integration that included the optional crashlytics and perfor
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "plugins": [
-      "@react-native-firebase/app"
-      "@react-native-firebase/perf"
+      "@react-native-firebase/app",
+      "@react-native-firebase/perf",
       "@react-native-firebase/crashlytics"
     ]
   }
 }
 ```
 
-Next, rebuild your app as described in the ["Adding custom native code"](https://docs.expo.io/workflow/customizing/) guide.
+Next, you need to use the `expo prebuild --clean` command as described in the ["Adding custom native code"](https://docs.expo.io/workflow/customizing/) guide to rebuild your app with the plugin changes. If this command isn't run, you'll encounter connection errors to Firebase.
 
 Config plugins are only required for React Native Firebase modules, which require custom native installation steps - e.g. modifying the Xcode project, `Podfile`, `build.gradle`, `AndroidManifest.xml` etc. Packages without native steps required will work out of the box.
 

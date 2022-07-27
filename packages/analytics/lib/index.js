@@ -17,6 +17,7 @@
 
 import {
   isAlphaNumericUnderscore,
+  isIOS,
   isNull,
   isNumber,
   isObject,
@@ -37,7 +38,13 @@ import version from './version';
 import * as structs from './structs';
 
 const ReservedEventNames = [
+  'ad_activeview',
+  'ad_click',
+  'ad_exposure',
+  // 'ad_impression', // manual ad_impression logging is allowed, See #6307
+  'ad_query',
   'ad_reward',
+  'adunit_exposure',
   'app_background',
   'app_clear_data',
   // 'app_exception',
@@ -53,6 +60,7 @@ const ReservedEventNames = [
   'dynamic_link_first_open',
   'error',
   'first_open',
+  'first_visit',
   'in_app_purchase',
   'notification_dismiss',
   'notification_foreground',
@@ -91,13 +99,6 @@ class FirebaseAnalyticsModule extends FirebaseModule {
     if (!isAlphaNumericUnderscore(name) || name.length > 40) {
       throw new Error(
         `firebase.analytics().logEvent(*) 'name' invalid event name '${name}'. Names should contain 1 to 40 alphanumeric characters or underscores.`,
-      );
-    }
-
-    // maximum number of allowed params check
-    if (params && Object.keys(params).length > 25) {
-      throw new Error(
-        "firebase.analytics().logEvent(_, *) 'params' maximum number of parameters exceeded (25).",
       );
     }
 
@@ -675,6 +676,20 @@ class FirebaseAnalyticsModule extends FirebaseModule {
     }
 
     return this.native.setDefaultEventParameters(params);
+  }
+
+  initiateOnDeviceConversionMeasurementWithEmailAddress(emailAddress) {
+    if (!isString(emailAddress)) {
+      throw new Error(
+        "firebase.analytics().initiateOnDeviceConversionMeasurementWithEmailAddress(*) 'emailAddress' expected a string value.",
+      );
+    }
+
+    if (!isIOS) {
+      return;
+    }
+
+    return this.native.initiateOnDeviceConversionMeasurementWithEmailAddress(emailAddress);
   }
 }
 

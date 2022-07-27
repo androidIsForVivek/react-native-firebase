@@ -2,7 +2,7 @@
 title: Cloud Messaging
 description: Installation and getting started with Cloud Messaging.
 icon: //static.invertase.io/assets/firebase/cloud-messaging.svg
-next: /messaging/ios-permissions
+next: /messaging/usage/ios-setup
 previous: /functions/writing-deploying-functions
 ---
 
@@ -111,10 +111,9 @@ The device state and message contents determines which handler will be called:
   as low priority and will ignore it (i.e. no event will be sent). You can however increase the priority by setting the `priority` to `high` (Android) and
   `content-available` to `true` (iOS) properties on the payload.
 
-- On iOS in cases where the message is data-only and the device is in the background or quit, the message will be delayed 8 seconds
-  from the time it arrives on the device until the background message handler registered with setBackgroundMessageHandler is invoked
-  to allow for the applications javascript to be loaded and ready to run [Issue 4144]
-  (https://github.com/invertase/react-native-firebase/pull/4144).
+- On iOS in cases where the message is data-only and the device is in the background or quit, the message will be delayed
+  until the background message handler is registered via setBackgroundMessageHandler, signaling the application's javascript
+  is loaded and ready to run.
 
 To learn more about how to send these options in your message payload, view the Firebase documentation for your [FCM API implementation](https://firebase.google.com/docs/cloud-messaging/concept-options).
 
@@ -312,6 +311,12 @@ messaging()
 
 On Android, the `isHeadless` prop will not exist.
 
+#### iOS Background Limitation
+
+On iOS devices, the user is able to toggle Background App Refresh in device's Settings. Furthermore, the Background App Refresh setting will automatically be off if the device is in low power mode.
+
+If the iOS Background App Refresh mode is off, your handler configured in `setBackgroundMessageHandler` will not be triggered.
+
 ### Topics
 
 Topics are a mechanism which allow a device to subscribe and unsubscribe from named PubSub channels, all managed via FCM.
@@ -381,6 +386,20 @@ async function registerAppWithFCM() {
 }
 ```
 
+## Foreground Presentation Options (iOS)
+
+React Native Firebase Messaging configures how to present a notification in a foreground app.
+Refer to [UNNotificationPresentationOptions](https://developer.apple.com/documentation/usernotifications/unnotificationpresentationoptions) for the details.
+
+```json
+// <projectRoot>/firebase.json
+{
+  "react-native": {
+    "messaging_ios_foreground_presentation_options": ["badge", "sound", "list", "banner"]
+  }
+}
+```
+
 ## Auto initialization
 
 Firebase generates an Instance ID, which FCM uses to generate a registration token and which Analytics uses for data collection.
@@ -439,7 +458,7 @@ On Android, any messages which display a [Notification](/messaging/notifications
 (such as the small icon, title etc). To provide a custom tint color, update the `messaging_android_notification_color` property
 with a Android color resource name.
 
-The library provides a set of [predefined colors](https://github.com/invertase/react-native-firebase/blob/master/packages/messaging/android/src/main/res/values/colors.xml) corresponding to the [HTML colors](https://www.w3schools.com/colors/colors_names.asp) for convenience, for example:
+The library provides a set of [predefined colors](https://github.com/invertase/react-native-firebase/blob/main/packages/messaging/android/src/main/res/values/colors.xml) corresponding to the [HTML colors](https://www.w3schools.com/colors/colors_names.asp) for convenience, for example:
 
 ```json
 // <projectRoot>/firebase.json

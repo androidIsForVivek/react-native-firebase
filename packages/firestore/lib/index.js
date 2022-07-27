@@ -84,6 +84,30 @@ class FirebaseFirestoreModule extends FirebaseModule {
     return new FirestoreWriteBatch(this);
   }
 
+  loadBundle(bundle) {
+    if (!isString(bundle)) {
+      throw new Error("firebase.firestore().loadBundle(*) 'bundle' must be a string value.");
+    }
+
+    if (bundle === '') {
+      throw new Error("firebase.firestore().loadBundle(*) 'bundle' must be a non-empty string.");
+    }
+
+    return this.native.loadBundle(bundle);
+  }
+
+  namedQuery(queryName) {
+    if (!isString(queryName)) {
+      throw new Error("firebase.firestore().namedQuery(*) 'queryName' must be a string value.");
+    }
+
+    if (queryName === '') {
+      throw new Error("firebase.firestore().namedQuery(*) 'queryName' must be a non-empty string.");
+    }
+
+    return new FirestoreQuery(this, this._referencePath, new FirestoreQueryModifiers(), queryName);
+  }
+
   async clearPersistence() {
     await this.native.clearPersistence();
   }
@@ -94,6 +118,27 @@ class FirebaseFirestoreModule extends FirebaseModule {
 
   async terminate() {
     await this.native.terminate();
+  }
+
+  useEmulator(host, port) {
+    if (!host || !isString(host) || !port || !isNumber(port)) {
+      throw new Error('firebase.firestore().useEmulator() takes a non-empty host and port');
+    }
+    let _host = host;
+    const androidBypassEmulatorUrlRemap =
+      typeof this.firebaseJson.android_bypass_emulator_url_remap === 'boolean' &&
+      this.firebaseJson.android_bypass_emulator_url_remap;
+    if (!androidBypassEmulatorUrlRemap && isAndroid && _host) {
+      if (_host === 'localhost' || _host === '127.0.0.1') {
+        _host = '10.0.2.2';
+        // eslint-disable-next-line no-console
+        console.log(
+          'Mapping firestore host to "10.0.2.2" for android emulators. Use real IP on real devices. You can bypass this behaviour with "android_bypass_emulator_url_remap" flag.',
+        );
+      }
+    }
+    this.native.useEmulator(_host, port);
+    return [_host, port]; // undocumented return, just used to unit test android host remapping
   }
 
   collection(collectionPath) {
@@ -143,6 +188,7 @@ class FirebaseFirestoreModule extends FirebaseModule {
       this,
       this._referencePath.child(collectionId),
       new FirestoreQueryModifiers().asCollectionGroupQuery(),
+      undefined,
     );
   }
 
@@ -233,6 +279,10 @@ class FirebaseFirestoreModule extends FirebaseModule {
     }
 
     if (!isUndefined(settings.host)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'host in settings to connect with firestore emulator is deprecated. Use useEmulator instead.',
+      );
       if (!isString(settings.host)) {
         return Promise.reject(
           new Error("firebase.firestore().settings(*) 'settings.host' must be a string value."),
